@@ -1,5 +1,9 @@
-const axios = require('axios');
 require('dotenv').config()
+const axios = require('axios');
+const { get } = require('request');
+const BOT_ID = process.env.BOT_ID
+const CHAT_ID = process.env.CHAT_ID
+const msgDefault = `https://api.telegram.org/${BOT_ID}/sendMessage?chat_id=${CHAT_ID}&parse_mode=Markdown&text=`
 
 const headers = {
   'Host': 'web.11ri.com.br',
@@ -24,17 +28,27 @@ const headers = {
 };
 const dataString = `acao=consultar&Protocolo=${process.env.RI}&pesquisar.x=88&pesquisar.y=25`;
 
-axios({
-  method: 'POST',
-  url: 'https://web.11ri.com.br/index.php?pG=X19jb25zdWx0YV90aXR1bG9zX2NhcnRvb24=',
-  headers: headers,
-  data: dataString
-})
-  .then(res => {
-    if(res.data.includes('EM EXAME.')){
-      console.log('OK')
-    }
+function check () {
+  axios({
+    method: 'POST',
+    url: 'https://web.11ri.com.br/index.php?pG=X19jb25zdWx0YV90aXR1bG9zX2NhcnRvb24=',
+    headers: headers,
+    data: dataString
   })
-  .catch(err=>{
-    console.log(err)
-  })
+    .then(res => {
+      if (!res.data.includes('EM EXAME.')) {
+        const msg = msgDefault + 'AINDA NADA'
+        axios.get(msg)
+      } else {
+        const msg = msgDefault + 'UHUUUUUUUUUU BOOOOORA'
+        axios.get(msg)
+      }
+    })
+    .catch(err => {
+      console.log(err)
+    })
+}
+
+setInterval(()=>{
+  check()
+}, 10000)
